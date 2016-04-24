@@ -7,15 +7,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import jyp.ConstructorArgument;
-import jyp.beans.PropertyValue;
-import jyp.beans.factory.config.ConstructorArgumentValues;
-import jyp.beans.PropertyValues;
-import jyp.beans.factory.support.AbstractBeanDefinitionReader;
-import jyp.beans.factory.support.BeanDefinitionReader;
-import jyp.beans.factory.support.BeanDefinitionRegistry;
-import jyp.beans.factory.support.RootBeanDefinition;
-import jyp.core.io.Resource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
@@ -23,6 +14,15 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
+import jyp.ConstructorArgument;
+import jyp.beans.PropertyValue;
+import jyp.beans.PropertyValues;
+import jyp.beans.factory.config.ConstructorArgumentValues;
+import jyp.beans.factory.support.AbstractBeanDefinitionReader;
+import jyp.beans.factory.support.BeanDefinitionRegistry;
+import jyp.beans.factory.support.RootBeanDefinition;
+import jyp.core.io.Resource;
 
 public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 
@@ -34,6 +34,9 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
     private static final String VALUE_ATTRIBUTE = "value";
     private static final String CONSTRUCTOR_ARG = "constructor-arg";
     private static final String REF_ATTRIBUTE = "ref";
+
+    private static final String SCOPE_ATTRIBUTE = "scope";
+
     protected final Log logger = LogFactory.getLog(getClass());
 
     /*private final BeanDefinitionRegistry beanDefinitionRegistry;*/
@@ -95,10 +98,19 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 
         PropertyValues propertyValues = createPropertyValues(element);
         ConstructorArgumentValues constructorArgument = createConstructorArgument(element);
+        String scope = readScopeValue(element);
         RootBeanDefinition rootBeanDefinition = createBeanDefinition(element, id, propertyValues,
-            constructorArgument);
+            constructorArgument, scope);
         this.getBeanFactory().registerBeanDefinition(id, rootBeanDefinition);
         /*beanDefinitionRegistry.registerBeanDefinition(id, rootBeanDefinition);*/
+    }
+
+    private String readScopeValue(Element element) {
+        String scopeValue = element.getAttribute(SCOPE_ATTRIBUTE);
+        if (scopeValue == null || "".equals(scopeValue)) {
+            return "singleton";
+        }
+        return scopeValue;
     }
 
     private ConstructorArgumentValues createConstructorArgument(Element element) {
@@ -168,14 +180,15 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
     private RootBeanDefinition createBeanDefinition(Element element,
                                                     String id,
                                                     PropertyValues propertyValues,
-                                                    ConstructorArgumentValues constructorArgumentValues) {
+                                                    ConstructorArgumentValues constructorArgumentValues,
+                                                    String scope) {
         if (!element.hasAttribute(CLASS_ATTRIBUTE))
             throw new IllegalArgumentException("Bean without class attribute");
         String classname = element.getAttribute(CLASS_ATTRIBUTE);
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         try {
             return new RootBeanDefinition(Class.forName(classname, true, classLoader), propertyValues,
-                constructorArgumentValues);
+                constructorArgumentValues, scope);
         } catch (ClassNotFoundException e) {
             throw new UnsupportedOperationException(
                 "Error creating bean with name [" + id + "]: class '" + classname + "' not found", e);

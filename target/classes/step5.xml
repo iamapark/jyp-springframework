@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans>
-    <bean id="jyp" class="jyp.bean.Jyp">
-    </bean>
+<bean id="jyp" class="jyp.bean.Jyp" scope="prototype">
+</bean>
 </beans>

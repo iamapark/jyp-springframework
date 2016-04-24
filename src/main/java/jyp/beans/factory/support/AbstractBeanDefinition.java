@@ -23,6 +23,10 @@ public abstract class AbstractBeanDefinition implements BeanDefinition {
         return this.singleton;
     }
 
+    public void setSingleton(boolean singleton) {
+        this.singleton = singleton;
+    }
+
     @Override
     public PropertyValues getPropertyValues() {
         return this.propertyValues;

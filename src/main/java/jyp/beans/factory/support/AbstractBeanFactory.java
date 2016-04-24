@@ -1,6 +1,17 @@
 package jyp.beans.factory.support;
 
-import jyp.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.*;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.BeanDefinitionStoreException;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+
+import jyp.ConstructorArgument;
 import jyp.beans.PropertyValue;
 import jyp.beans.PropertyValues;
 import jyp.beans.factory.*;
@@ -8,22 +19,12 @@ import jyp.beans.factory.config.BeanDefinition;
 import jyp.beans.factory.config.BeanPostProcessor;
 import jyp.beans.factory.config.ConfigurableBeanFactory;
 import jyp.beans.factory.config.ConstructorArgumentValues;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.factory.BeanDefinitionStoreException;
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.*;
 
 public abstract class AbstractBeanFactory implements ConfigurableBeanFactory, HierarchicalBeanFactory {
 
     private static final Object CURRENTLY_IN_CREATION = new Object();
     protected final Log logger = LogFactory.getLog(getClass());
-    private final List beanPostProcessors = new ArrayList<>();
+    private final List<BeanPostProcessor> beanPostProcessors = new ArrayList<>();
     /**
      * Map of Bean objects, keyed by id attribute
      */

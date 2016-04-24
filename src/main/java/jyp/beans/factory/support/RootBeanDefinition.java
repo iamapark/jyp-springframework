@@ -1,7 +1,7 @@
 package jyp.beans.factory.support;
 
-import jyp.beans.factory.config.ConstructorArgumentValues;
 import jyp.beans.PropertyValues;
+import jyp.beans.factory.config.ConstructorArgumentValues;
 
 public class RootBeanDefinition extends AbstractBeanDefinition {
 
@@ -9,10 +9,11 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
     private final ConstructorArgumentValues constructorArgumentValues;
 
     public RootBeanDefinition(Class clazz, PropertyValues propertyValues,
-            ConstructorArgumentValues constructorArgumentValues) {
+            ConstructorArgumentValues constructorArgumentValues, String scope) {
         super(propertyValues);
         this.clazz = clazz;
         this.constructorArgumentValues = constructorArgumentValues;
+        super.setSingleton(scope.equals("singleton"));
     }
 
     public Class getBeanClass() {
